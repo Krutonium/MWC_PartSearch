@@ -29,6 +29,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\.local\share\Steam\steamapps\common\My Winter Car\mywintercar_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <HintPath>/usr/lib/mono/2.0-api/System.Core.dll</HintPath>

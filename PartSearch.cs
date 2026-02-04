@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MSCLoader;
 using HutongGames.PlayMaker;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace PartSearch {
@@ -39,21 +40,18 @@ namespace PartSearch {
                 {
                     ClearHighlight();
                 }
-
-                foreach (var item in parts)
-                {
-                    if (item.name.Contains("Oilpan"))
-                    {
-                        ModConsole.Print(item.name);
-                    }
-                }
                 applied = !applied;
             }
         }
 
+        class Part
+        {
+            public string partName;
+        }
         private void DoActualWork(string SearchText)
         {
-            ModConsole.Print(SearchText);
+            //ModConsole.Print(SearchText);
+            var partObj = JsonConvert.DeserializeObject<Part>(SearchText);
             parts = new HashSet<GameObject>();
             Transform player = GameObject.Find("PLAYER").transform;
             Collider[] hits = Physics.OverlapSphere(
@@ -63,7 +61,7 @@ namespace PartSearch {
             );
             foreach (Collider hit in hits)
             {
-                if (hit.name.Contains("VINXX") && hit.name.ToLower().Contains(searchText.ToLower()))
+                if (hit.name.Contains("VINXX") && hit.name.ToLower().Contains(partObj.partName.ToLower()))
                 {
                     parts.Add(hit.gameObject);
                 }
@@ -74,17 +72,14 @@ namespace PartSearch {
         {
             GameObject settingsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
             settingsMenu.SetActive(true);
-            var PlayerInMenu = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu");
-            var PlayerStop = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop");
-            PlayerInMenu.Value = true;
-            PlayerStop.Value = true;
-            
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu").Value = true;
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop").Value = true;
             PopupSetting popupSetting = ModUI.CreatePopupSetting("Parts Search", "Search");
             popupSetting.AddTextBox("partName", "Part Name", string.Empty, "Name of the Part");
-            popupSetting.ShowPopup(DoActualWork);
             settingsMenu.SetActive(false);
-            PlayerInMenu.Value = false;
-            PlayerStop.Value = false;
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu").Value = false;
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop").Value = false;
+            popupSetting.ShowPopup(DoActualWork);
         }
 
         
