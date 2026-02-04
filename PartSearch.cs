@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MSCLoader;
@@ -25,31 +26,14 @@ namespace PartSearch {
             new Dictionary<Renderer, Material[]>();
 
         private bool applied = false;
+        private string searchText;
         private void DoSearch()
         {
             if (FindItems.GetKeybindDown())
             {
                 if (!applied)
                 {
-                    var search = ModUI.CreatePopupSetting("Search", "Search");
-                    search.AddTextBox("searchItem", "Search", "", "Oilpan");
-                    search.ShowPopup(null, false);
-                    
-                    parts = new HashSet<GameObject>();
-                    Transform player = GameObject.Find("PLAYER").transform;
-                    Collider[] hits = Physics.OverlapSphere(
-                        player.position,
-                        20,
-                        ~0
-                    );
-                    foreach (Collider hit in hits)
-                    {
-                        if (hit.name.Contains("VINXX"))
-                        {
-                            parts.Add(hit.gameObject);
-                        }
-                    }
-                    ApplyGreenHighlight(parts.ToList());
+                    CreatePopupWindow();
                 }
                 else
                 {
@@ -63,10 +47,46 @@ namespace PartSearch {
                         ModConsole.Print(item.name);
                     }
                 }
-
                 applied = !applied;
             }
         }
+
+        private void DoActualWork(string SearchText)
+        {
+            ModConsole.Print(SearchText);
+            parts = new HashSet<GameObject>();
+            Transform player = GameObject.Find("PLAYER").transform;
+            Collider[] hits = Physics.OverlapSphere(
+                player.position,
+                20,
+                ~0
+            );
+            foreach (Collider hit in hits)
+            {
+                if (hit.name.Contains("VINXX") && hit.name.ToLower().Contains(searchText.ToLower()))
+                {
+                    parts.Add(hit.gameObject);
+                }
+            }
+            ApplyGreenHighlight(parts.ToList());
+        }
+        private void CreatePopupWindow()
+        {
+            GameObject settingsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
+            settingsMenu.SetActive(true);
+            var PlayerInMenu = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu");
+            var PlayerStop = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop");
+            PlayerInMenu.Value = true;
+            PlayerStop.Value = true;
+            
+            PopupSetting popupSetting = ModUI.CreatePopupSetting("Parts Search", "Search");
+            popupSetting.AddTextBox("partName", "Part Name", string.Empty, "Name of the Part");
+            popupSetting.ShowPopup(DoActualWork);
+            settingsMenu.SetActive(false);
+            PlayerInMenu.Value = false;
+            PlayerStop.Value = false;
+        }
+
         
         void ApplyGreenHighlight(List<GameObject> objects)
         {
@@ -122,6 +142,7 @@ namespace PartSearch {
 
             highlightMat.SetFloat("_Glossiness", 0.0f);
             highlightMat.SetFloat("_Metallic", 0.0f);
+            
         }
     }
 }
