@@ -71,13 +71,14 @@ namespace PartSearch {
             settingsMenu.SetActive(false);
             PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu").Value = false;
             PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop").Value = false;
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerComputer").Value = false;
         }
         private void CreatePopupWindow()
         {
-            
             settingsMenu.SetActive(true);
             PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu").Value = true;
             PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop").Value = true;
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerComputer").Value = true;
             PopupSetting popupSetting = ModUI.CreatePopupSetting("Parts Search", "Search");
             popupSetting.AddTextBox("partName", "Part Name", string.Empty, "Name of the Part");
             popupSetting.ShowPopup(DoActualWork);
