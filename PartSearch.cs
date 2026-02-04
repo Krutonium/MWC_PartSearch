@@ -22,6 +22,7 @@ namespace PartSearch {
         }
 
         private Material highlightMat;
+        GameObject settingsMenu;
         HashSet<GameObject> parts;
         Dictionary<Renderer, Material[]> originalMaterials =
             new Dictionary<Renderer, Material[]>();
@@ -67,18 +68,18 @@ namespace PartSearch {
                 }
             }
             ApplyGreenHighlight(parts.ToList());
+            settingsMenu.SetActive(false);
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu").Value = false;
+            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop").Value = false;
         }
         private void CreatePopupWindow()
         {
-            GameObject settingsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
+            
             settingsMenu.SetActive(true);
             PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu").Value = true;
             PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop").Value = true;
             PopupSetting popupSetting = ModUI.CreatePopupSetting("Parts Search", "Search");
             popupSetting.AddTextBox("partName", "Part Name", string.Empty, "Name of the Part");
-            settingsMenu.SetActive(false);
-            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu").Value = false;
-            PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop").Value = false;
             popupSetting.ShowPopup(DoActualWork);
         }
 
@@ -138,6 +139,7 @@ namespace PartSearch {
             highlightMat.SetFloat("_Glossiness", 0.0f);
             highlightMat.SetFloat("_Metallic", 0.0f);
             
+            settingsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
         }
     }
 }
